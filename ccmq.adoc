@@ -1,0 +1,407 @@
+= Crown and Conquer: Mastering Queens
+Zhen Wang <https://linkedin.com/in/zhenwang>
+v1.0, 2024-09-03
+:stylesheet: ccmq.css
+:sectnums:
+:toc:
+
+[queens]
+axaxaxbxcqcxcxcxcx
+axbxbxbxcxixiqixix
+aqaxaxbxcxcxcxcxcx
+bxbxbxbxbxbqbxbxbx
+fxfxfqbxbxbxhxhxhx
+fxfxfxfxfxbxhxkqhx
+fxdqfxfxfxbxhxhxhx
+fxdxfxgxfxbxbxbxhq
+fxdxfxgqfxbxbxbxbx
+
+<<<
+== Introduction
+=== Origin
+Queens is a logic game that challeges players to place queens (or crowns) on a square grid.
+Launched by LinkedIn as one of three daily puzzles in 2024 [{counter:ref}], it follows rules similar to the Star Battle puzzle created by Hans Eendebak for the 2003 World Puzzle Championship [{counter:ref}].
+
+=== Rules
+The goal is to place N queens on an N-by-N grid (divided into connected cells known as regions), adhering to the rules:
+
+* Each row, column, and region must contain exactly one queen.
+* Queens cannot be placed in adjacent cells, including diagonally.
+
+Players may mark cells with an X to indicate where queens cannot be placed.
+
+A well-constructed puzzle has a unique solution that can be found through logic alone.
+
+<<<
+== Regional patterns
+=== Singleton
+A singleton is a one-cell region that must contain a queen. It's the most basic pattern and should be identified first.
+
+Example {counter:ex}:
+[queens]
+a.b.b.b.b.
+a.c.d.b.f.
+a.d.d.b.f.
+a.a.d.f.f.
+d.d.d.d.f.
+
+b4 is a singleton where a queen can be immediately placed.
+
+[queens]
+a.b.b.b.b.
+a.cqd.b.f.
+a.d.d.b.f.
+a.a.d.f.f.
+d.d.d.d.f.
+
+You may now mark the entire row (4), column (b), and diagonally adjacent cells (a3, a5, c3, c5) with an X to indicate that queens cannot be placed there. This will help you identify other patterns. LinkedIn Queens can do this automatically if you enable the "Auto-place X's" option under "Settings".
+
+[queens]
+axbxbxb.b.
+axcqdxbxfx
+axdxdxb.f.
+a.axd.f.f.
+d.dxd.d.f.
+
+Notice that the L-shaped purple region has only one cell left for a queen (a2). It has effectively collapsed into a singleton.
+
+=== K-in-a-row
+The k-in-a-row pattern occurs when k candidate cells from the same region are in a row or column, with no other possible cells.
+One of these cells must contain a queen, allowing you to eliminate other cells in the same row or column.
+
+Example {ex} (continued):
+[queens]
+axbxbxb.b.
+axcqdxbxfx
+axdxdxb.f.
+aqaxdxfxfx
+dxdxd.d.f.
+
+The green region is left with only two cells (c1, d1). Both fall on the same row, forming a k-in-a-row pattern which eliminates e1.
+
+e1 and e3, even though they are not adjacent, also form a k-in-a-row pattern which rules out e5.
+
+=== Pair and Triplet
+Pairs (k = 2) and triplets (k = 3) are special cases of the k-in-a-row pattern.
+
+A pair allows you to eliminate cells along the same row or column and adjacent cells running parallel to the pair.
+
+Example {counter:ex}:
+[queens]
+a.b.b.c.
+a.b.c.c.
+d.d.d.c.
+d.d.d.c.
+
+a3-a4 in the purple region eliminates a1 and a2 along the same column. The pair also rules out b3-b4.
+
+[queens]
+a.bxb.c.
+a.bxc.c.
+dxd.d.c.
+dxd.d.c.
+
+A triplet helps eliminate neighbors adjacent to the middle cell.
+
+Example {counter:ex}:
+[queens]
+a.a.a.c.
+b.d.a.c.
+b.d.a.c.
+b.d.a.a.
+
+There're three triplets in this puzzle: a1-a2-a3 rules out b2; d2-d3-d4 rules out c3; b1-b2-b3 rules out a2 and c2 on both sides.
+
+[queens]
+a.a.a.c.
+b.d.axc.
+bxdxaxc.
+b.d.a.a.
+
+=== V3
+V3 is a V-shaped pattern of three cells. Up to three adjacent cells can be eliminated.
+
+Example {counter:ex}:
+[queens]
+e.e.e.e.
+e.a.exe.
+exa.a.e.
+e.exe.e.
+
+Please ignore gray cells.
+
+=== L4
+L4 is an L-shaped pattern of four cells. Up to two adjacent cells can be eliminated.
+
+Example {counter:ex}:
+[queens]
+e.e.e.e.e.
+e.a.e.e.e.
+e.a.exe.e.
+e.a.a.e.e.
+e.exe.e.e.
+
+=== V5, J6, U7
+V5, J6, and U7 are patterns where a surrounded cell can't be a queen.
+
+Example {counter:ex}:
+[queens]
+e.e.e.e.e.e.e.e.e.
+e.a.a.a.e.b.b.b.e.
+e.a.exe.e.e.exb.e.
+e.a.e.e.e.e.b.b.e.
+e.e.e.e.e.e.e.e.e.
+e.d.e.d.e.e.e.e.e.
+e.d.exd.e.e.e.e.e.
+e.d.d.d.e.e.e.e.e.
+e.e.e.e.e.e.e.e.e.
+
+=== Z, W, and variants
+Z (4+ cells), W (5+ cells), and their variants can eliminate one neighboring cell.
+
+Example {counter:ex}:
+[queens]
+e.e.e.e.e.e.e.e.e.
+e.e.e.e.e.e.e.e.e.
+e.b.b.b.b.b.exe.e.
+e.e.e.e.e.b.b.b.e.
+e.a.e.e.e.e.e.e.e.
+e.a.a.e.e.e.e.e.e.
+e.exa.a.a.a.a.a.e.
+e.e.e.e.e.e.e.e.e.
+e.e.e.e.e.e.e.e.e.
+
+=== T, Y, and variants
+T (4+ cells), Y (6+ cells), and their variants can eliminate one neighboring cell.
+
+Example {counter:ex}:
+[queens]
+e.e.exe.e.e.e.e.e.
+e.a.a.a.e.b.e.b.e.
+e.e.a.e.e.b,exb.e.
+e.e.e.e.e.b.b.b.e.
+e.e.d.d.e.e.b.e.e.
+e.e.exd.d.e.b.e.e.
+e.d.d.d.e.e.b.e.e.
+e.e.d.e.e.e.b.e.e.
+e.e.e.e.e.e.e.e.e.
+
+=== Full row and full column
+When an entire row or column is covered by a region, the rest of the region can be eliminated.
+
+Example {counter:ex}:
+[queens]
+a.a.b.b.
+a.b.b.c.
+a.a.a.c.
+a.d.d.c.
+
+The purple region covers the first column which must contain a queen. Therefore, b2, b4, and c2 can be marked with an X:
+
+[queens]
+a.axb.b.
+a.b.b.c.
+a.axaxc.
+a.d.d.c.
+
+If a region covers both a full row and a full column, their intersection cell must contain a queen.
+
+Example {counter:ex}:
+[queens]
+a.a.f.f.b.
+a.f.f.b.b.
+f.f.f.f.f.
+d.d.f.f.c.
+d.f.f.c.c.
+
+The pink region covers both column c and row 3. c3 must contain a queen:
+[queens]
+a.a.fxfxb.
+a.fxfxbxb.
+fxfxfqfxfx
+d.dxfxfxc.
+d.fxfxc.c.
+
+<<<
+== Global patterns
+=== Pairing and Grouping
+If two regions, not necessarily adjacent, are fully covered by the same two rows or columns, a third region sharing those rows or columns cannot contain a queen in the area.
+
+Example {counter:ex}:
+[queens]
+a.f.f.f.c.
+a.a.f.c.c.
+f.f.f.d.d.
+f.b.b.d.b.
+b.b.b.b.b.
+
+Row 4 and 5 fully cover the purple and blue regions, so the queen in the pink region must not be in the top two rows.
+
+[queens]
+a.fxfxfxc.
+a.a.fxc.c.
+f.f.f.d.d.
+f.b.b.d.b.
+b.b.b.b.b.
+
+For the same reason, the blue region and the green region form a vertical pair that eliminates other cells in column d and e.
+
+[queens]
+a.fxfxfxc.
+a.a.fxc.c.
+f.f.f.d.d.
+f.b.b.d.bx
+b.b.b.bxbx
+
+The pink region and the green region are now fully contained in row 2 and 3, thus forming a new horizontal pair that rules out b2 and c2.
+
+[queens]
+a.fxfxfxc.
+a.a.fxc.c.
+f.f.f.d.d.
+f.bxbxd.bx
+b.b.b.bxbx
+
+Grouping is an extension of pairing to N regions covered by N rows or columns. The regions are not necessarily adjacent.
+
+Example {counter:ex}:
+[queens]
+a.a.b.b.b.
+c.b.b.d.b.
+c.c.c.d.b.
+c.f.f.d.b.
+f.f.d.d.b.
+
+Column a, b, and c fully cover the purple, blue, and pink regions. Therefore, c1, b4, c4, and c5 can be marked with an X.
+
+[queens]
+a.a.bxb.b.
+c.bxbxd.b.
+c.c.c.d.b.
+c.f.f.d.b.
+f.f.dxd.b.
+
+=== Flanking
+When a row or column has only two or three candidate cells left, examine adjacent rows or columns to potentially eliminate options.
+
+Example {counter:ex}:
+[queens]
+a.a.a.b.b.
+a.c.axc.b.
+a.c.c.c.b.
+axd.cxf.bx
+d.d.dxf.f.
+
+You might have reached this point where row 2 has only two cells left. It's not immediately clear which one should be marked with a queen. Now shift your attention to row 3. Notice that c3 can't have a queen, otherwise it will eliminate both b2 and d2, rendering row 2 queenless.
+
+Alternatively, you can also inspect column c and rule out b4 and d4 by using the same logic.
+
+[queens]
+a.a.a.b.b.
+a.cxaxcxb.
+a.c.cxc.b.
+axd.cxf.bx
+d.d.dxf.f.
+
+=== Cornering and Edging
+In rare cases, corner and edge cells may be eliminated altogether due to the unique constraints they impose on corner regions.
+Again, please ignore gray cells.
+
+Example {counter:ex}:
+[queens]
+a.a.a.e.e.e.b.b.b.
+a.e.e.e.e.e.e.e.b.
+a.e.e.e.e.e.e.e.b.
+e.e.e.e.e.e.e.e.e.
+e.e.e.e.e.e.e.e.e.
+e.e.e.e.e.e.e.e.e.
+d.e.e.e.e.e.e.e.c.
+d.e.e.e.e.e.e.e.c.
+d.d.d.e.e.e.c.c.c.
+
+Without loss of generality, let's tentatively place a queen at a9:
+
+[queens]
+aQaxaxexexexbxbxbx
+axexe.e.e.e.e.e.b.
+axe.e.e.e.e.e.e.b.
+exe.e.e.e.e.e.e.e.
+exe.e.e.e.e.e.e.e.
+exe.e.e.e.e.e.e.e.
+dxe.e.e.e.e.e.e.c.
+dxe.e.e.e.e.e.e.c.
+dxd.d.e.e.e.c.c.c.
+
+b1-c1 and i7-i8 are now forced to clear out row 1 and column i, respectively, turning the blue region queenless.
+
+[queens]
+aQaxaxexexexbxbxbx
+axexe.e.e.e.e.e.b.
+axe.e.e.e.e.e.e.b.
+exe.e.e.e.e.e.e.ex
+exe.e.e.e.e.e.e.ex
+exe.e.e.e.e.e.e.ex
+dxe.e.e.e.e.e.e.cX
+dxe.e.e.e.e.e.e.cX
+dxd.d.exexexcXcXcX
+
+You can rule out edge cells using the same logic:
+
+[queens]
+axa.a.exexexb.b.bx
+a.exe.e.e.e.e.exb.
+a.e.e.e.e.e.e.e.b.
+exe.e.e.e.e.e.e.ex
+exe.e.e.e.e.e.e.ex
+exe.e.e.e.e.e.e.ex
+d.e.e.e.e.e.e.e.c.
+d.exe.e.e.e.e.exc.
+dxd.d.exexexc.c.cx
+
+=== Illegal rectangle
+An illegal rectangle is an imaginary zone where four corner cells have two symmetrical queen arrangements. Any hypothesis leading to an illegal rectangle must be false, as Queens puzzles are guaranteed to have a unique solution.
+
+Example {counter:ex}:
+[queens]
+a.axb.cxc.
+a.axb.cxc.
+f.f.fxd.cx
+f.f.fxd.cx
+f.c.cxcxc.
+
+Suppose you've reached this point where you can't decide whether d2 or d3 has a queen in the green region. One way to look at it is to imagine a rectangle formed by a4, a5, c5, and c4. If you place a queen in d2, leaving no constraints on the rectangle, it will lead to two possible configurations of queens: a5-c4 and a4-c5.
+This contradicts the uniqueness of the solution. Therefore, d2 must be ruled out, and d3 must have a queen.
+
+For this particular example, there're more straightforward ways to reach the same conclusion. But the illegal rectangle technique can be useful in more complex puzzles.
+
+<<<
+== Strategies
+=== Move ordering
+You will often detect multiple patterns in a Queens puzzle. It's essential to optimize your solving order to speed up. Resist the urge to tackle the first pattern you see. Instead, quickly scan the grid for patterns that will lead to the most deductions.
+Prioritize rows, columns, and regions with the fewest cells left (most constrained).
+
+=== Backtracking
+If you're stuck, don't be afraid to resort to trial and error. It's better to undo a few moves than to waste time staring at the same grid.
+Try making a hypothesis and see if it leads to a contradiction.
+If a contradiction is found, undo the move and use the information gained to pinpoint at least one queen correctly.
+
+<<<
+.About the author
+Zhen Wang is a self-proclaimed Queens expert in Singapore.
+He's one of the fastest solvers on Puzzle Baron's website.
+For questions or suggestions, you can reach him via:
+
+* LinkedIn: https://linkedin.com/in/zhenwang
+* Email: z@zmxv.com
+
+Contributions are welcome at https://github.com/zmxv/ccmq
+
+[bibliography]
+== References
+
+* [{counter:bib}] LinkedIn News introduces games https://www.linkedin.com/news/story/linkedin-news-introduces-games-6715874/
+* [{counter:bib}] Star Battle Rules and Info https://www.gmpuzzles.com/blog/star-battle-rules-and-info/
+
+<<<
+You have reached the end of this short guide.
+Take a break and check out the author's original puzzle game Voggle at https://voggle.com.
